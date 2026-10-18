@@ -1,12 +1,14 @@
-name: Run Telegram STT Bot
+name: Build and Test
 
 on:
   push:
     branches: [ master ]
+  pull_request:
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:
-  run-bot:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,8 +26,24 @@ jobs:
     - name: Install ffmpeg (for pydub)
       run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-    - name: Create token file
-      run: echo "${{ secrets.TELEGRAM_BOT_TOKEN }}" > token.txt
+    - name: Validate bot can start
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      run: |
+        timeout 10 uv run python main.py || code=$?
+        if [ $code -eq 124 ]; then
+          echo "Bot started successfully (killed after 10s as expected)"
+          exit 0
+        else
+          echo "Bot failed to start"
+          exit $code
+        fi
 
-    - name: Run bot
-      run: uv run python main.py
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build Docker image
+      run: docker build -t stt-bot .
