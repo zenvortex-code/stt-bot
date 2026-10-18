@@ -80,7 +80,7 @@ async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "Use /language to see supported languages."
             )
 
-# Define the function that handles voice messages
+
 async def voice_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     file_path = None
     wav_path = None
