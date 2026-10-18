@@ -4,6 +4,8 @@ import speech_recognition as sr
 from pydub import AudioSegment
 import os
 import logging
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
 # Configure logging
 logging.basicConfig(
@@ -14,6 +16,24 @@ logger = logging.getLogger(__name__)
 
 # Constants
 TEMP_DIR = os.getenv('TEMP_DIR', '/tmp')
+PORT = int(os.getenv('PORT', 8080))
+
+# Health check server for Render
+class HealthCheckHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/plain')
+        self.end_headers()
+        self.wfile.write(b'OK')
+
+    def log_message(self, format, *args):
+        # Suppress HTTP server logs
+        pass
+
+def run_health_check_server():
+    server = HTTPServer(('0.0.0.0', PORT), HealthCheckHandler)
+    logger.info(f"Health check server running on port {PORT}")
+    server.serve_forever()
 
 # Define the function that runs when a user types /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -160,6 +180,10 @@ def get_token():
 
 if __name__ == '__main__':
     try:
+        # Start health check server in background thread (for Render)
+        health_thread = threading.Thread(target=run_health_check_server, daemon=True)
+        health_thread.start()
+
         token = get_token()
         app = ApplicationBuilder().token(token).build()
 
