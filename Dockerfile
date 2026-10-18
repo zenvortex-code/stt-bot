@@ -8,15 +8,14 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy project files
-COPY pyproject.toml ./
+COPY pyproject.toml uv.lock ./
 COPY main.py ./
-COPY src/ ./src/
 
 # Install uv
-RUN pip install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 # Install dependencies
-RUN uv pip install --system -e .
+RUN uv sync --frozen --no-dev
 
 # Run the bot
-CMD ["python", "main.py"]
+CMD ["uv", "run", "python", "main.py"]
