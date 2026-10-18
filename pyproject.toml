@@ -1,0 +1,20 @@
+[project]
+name = "stt-bot"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Oleg", email = "vortex@flyingsteps.org" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "python-telegram-bot>=21.0",
+    "speechrecognition>=3.10.0",
+    "pydub>=0.25.1",
+]
+
+[project.scripts]
+stt-bot = "stt_bot:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"

@@ -1,0 +1,12 @@
+
+services:
+  stt-bot:
+    build: .
+    secrets:
+      - bot_token
+    environment:
+      - TOKEN_FILE=/run/secrets/bot_token
+
+secrets:
+  bot_token:
+    file: ./token.txt
