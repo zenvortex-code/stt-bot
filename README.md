@@ -1,6 +1,7 @@
 # Telegram Speech-to-Text Bot
 
 A Telegram bot that transcribes voice messages to text using Google Speech Recognition.
+Test version - https://t.me/zen_vortex_stt_bot 
 
 ## Features
 
